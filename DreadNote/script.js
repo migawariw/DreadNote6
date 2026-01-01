@@ -208,7 +208,7 @@ async function loadMemos() {
 				e.preventDefault();
 				location.hash = `#/editor/${m.id}`;
 			};
-			
+			li.appendChild(link);
 
 
 
@@ -219,8 +219,7 @@ async function loadMemos() {
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
 			titleSpan.textContent = m.title || 'Untitled';
-			// li.appendChild( titleSpan );
-			li.appendChild(link);
+			li.appendChild( titleSpan );
 
 			/* =====================
 				 右側（日付 + メニュー）
