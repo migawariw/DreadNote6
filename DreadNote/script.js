@@ -198,11 +198,11 @@ async function loadMemos() {
 			   aタグでリンク化
 			   ===================== */
 			const link = document.createElement('a');
-			link.href = `#/editor/${m.id}`; // フルパスにしたい場合は window.location.origin + '/editor/' + m.id
-			link.onclick = e => {
-				e.preventDefault(); // 通常のリンク遷移を止める
-				location.hash = `#/editor/${m.id}`;
-			};
+			link.href = `/editor/${m.id}`; // フルパスにしたい場合は window.location.origin + '/editor/' + m.id
+			// link.onclick = e => {
+			// 	e.preventDefault(); // 通常のリンク遷移を止める
+			// 	location.hash = `#/editor/${m.id}`;
+			// };
 
 			/* =====================
 			   左側タイトル
