@@ -193,40 +193,40 @@ async function loadMemos() {
 		.forEach( m => {
 
 			const li = document.createElement( 'li' );
-			li.style.display = 'flex';
-			li.style.justifyContent = 'space-between';
-			li.style.alignItems = 'center';
-			li.style.padding = '8px 12px'; // 左右余白
-			li.style.borderBottom = '1px solid #ccc';
 
-
-			// タイトルリンク
+			/* ========== li 全体を覆う a ========== */
 			const link = document.createElement('a');
 			link.href = `#/editor/${m.id}`;
-			link.textContent = m.title || 'Untitled';
-			link.className = 'memo-title';
+			link.style.position = 'absolute';
+			link.style.top = '0';
+			link.style.left = '0';
+			link.style.width = '100%';
+			link.style.height = '100%';
+			link.style.textDecoration = 'none';
+			link.style.color = 'inherit';
 			link.onclick = e => {
 				e.preventDefault();
 				location.hash = `#/editor/${m.id}`;
 			};
-			link.style.flex = '1';  // 左側を伸ばす
-			link.style.textDecoration = 'none';
-			link.style.color = 'inherit';
-
-			li.appendChild(link);
 			
 
 
 
+			/* =====================
+				 左側タイトル
+				 ===================== */
+
+			const titleSpan = document.createElement( 'span' );
+			titleSpan.className = 'memo-title';
+			titleSpan.textContent = m.title || 'Untitled';
+			// li.appendChild( titleSpan );
+			li.appendChild(link);
 
 			/* =====================
 				 右側（日付 + メニュー）
 				 ===================== */
 			const rightDiv = document.createElement( 'div' );
-						rightDiv.className = 'memo-right';
-			rightDiv.style.display = 'flex';
-			rightDiv.style.alignItems = 'center';
-			rightDiv.style.gap = '4px';
+			rightDiv.className = 'memo-right';
 
 			const dateSpan = document.createElement( 'span' );
 			dateSpan.className = 'date-span';
