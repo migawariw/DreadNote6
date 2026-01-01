@@ -193,6 +193,7 @@ async function loadMemos() {
 		.forEach( m => {
 
 			const li = document.createElement( 'li' );
+			li.style.position = 'relative';
 
 			/* ========== li 全体を覆う a ========== */
 			const link = document.createElement('a');
@@ -219,7 +220,7 @@ async function loadMemos() {
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
 			titleSpan.textContent = m.title || 'Untitled';
-			// li.appendChild( titleSpan );
+			li.appendChild( titleSpan );
 			li.appendChild(link);
 
 			/* =====================
