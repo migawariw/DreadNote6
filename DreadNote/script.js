@@ -227,6 +227,8 @@ async function loadMemos() {
 				 ===================== */
 			const rightDiv = document.createElement( 'div' );
 			rightDiv.className = 'memo-right';
+			rightDiv.style.position = 'relative'; // z-index を効かせる
+rightDiv.style.zIndex = '100';          // a の上に表示
 
 			const dateSpan = document.createElement( 'span' );
 			dateSpan.className = 'date-span';
