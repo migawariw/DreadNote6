@@ -100,8 +100,8 @@ document.addEventListener( 'click', e => {
 
 /* Auth state */
 onAuthStateChanged( auth, async user => {
-	 // ★ ここで「画面を表示していい」と宣言
-  document.body.classList.remove('auth-loading');
+	// ★ ここで「画面を表示していい」と宣言
+	document.body.classList.remove( 'auth-loading' );
 	if ( !user ) {
 		location.hash = '#login';
 		show( 'login' );
@@ -182,7 +182,7 @@ async function loadMetaOnce() {
 	}
 
 	return metaCache;
-} 
+}
 async function loadMemos() {
 	await loadMetaOnce();
 	memoList.innerHTML = '';
@@ -195,18 +195,18 @@ async function loadMemos() {
 			const li = document.createElement( 'li' );
 
 			/* =====================
-			   aタグでリンク化
-			   ===================== */
-			const link = document.createElement('a');
-			link.href = `/editor/${m.id}`; // フルパスにしたい場合は window.location.origin + '/editor/' + m.id
-			link.onclick = e => {
-				// e.preventDefault(); 
+				 aタグでリンク化
+				 ===================== */
+			const link = document.createElement( 'a' );
+			link.addEventListener( 'click', e => {
+				e.preventDefault();
 				location.hash = `#/editor/${m.id}`;
-			};
+			} );
+
 
 			/* =====================
-			   左側タイトル
-			   ===================== */
+				 左側タイトル
+				 ===================== */
 
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
@@ -214,8 +214,8 @@ async function loadMemos() {
 			li.appendChild( titleSpan );
 
 			/* =====================
-			   右側（日付 + メニュー）
-			   ===================== */
+				 右側（日付 + メニュー）
+				 ===================== */
 			const rightDiv = document.createElement( 'div' );
 			rightDiv.className = 'memo-right';
 
@@ -267,14 +267,14 @@ async function loadMemos() {
 			};
 
 			rightDiv.append( dateSpan, menuBtn, menuPopup );
-						/* =====================
-			   aタグの中に右側も入れる
-			   ===================== */
+			/* =====================
+	 aタグの中に右側も入れる
+	 ===================== */
 			li.appendChild( rightDiv );
-						/* =====================
-			   li に a を追加
-			   ===================== */
-			li.appendChild(link);
+			/* =====================
+	 li に a を追加
+	 ===================== */
+			li.appendChild( link );
 			memoList.appendChild( li );
 		} );
 }
