@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="UTF-8">
+	<title>DreadNote</title>
+	<link rel="icon" href="../icon/img1.png" type="image/png">
+	<link rel="apple-touch-icon" href="../icon/img1.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../style.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+	<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+	<script async src="https://www.instagram.com/embed.js"></script>
+</head>
+
+<body class="auth-loading">
+
+	<section id="view-login" hidden>
+		<h1>DreadNote</h1>
+		<!-- <input id="email" placeholder="Gmail">
+		<input id="password" type="password" placeholder="password"><br>
+		<button id="login" type ="button">Login</button>
+		<button id="signup" type="button">Sign up</button><br><br>  -->
+		<!-- <button id="google-login">Login or Sign up with Google</button> -->
+		<button id="google-login">
+			<img src="../ios_dark_sq_ctn.svg" alt="">
+		</button>
+	</section>
+
+	<section id="view-list" hidden>
+		<div class="flex-between">
+			<h2>Notes</h2>
+			<div style="display:flex;gap:8px;align-items:center ;">
+				<button id="new-memo" style="font-size: 40px; margin-right: 12px; margin-left: 12px; 
+				 font-weight: 200; ">＋</button>
+				<!-- <button id="go-trash">🗑️</button> -->
+				<img id="user-icon" src="" title="User Menu">
+				<div id="user-menu">
+					<button id="spread-btn">Spread mode</button>
+					<button id="dark-btn">Dark mode</button>
+					<button id="go-trash">Trash</button>
+					<button id="logout-btn">Log out</button>
+				</div>
+			</div>
+		</div>
+		<ul id="memo-list"></ul>
+	</section>
+
+	<section id="view-trash" hidden>
+		<div class="flex-between">
+			<button id="back-list"> ＜ </button>
+			<h2>Trash</h2>
+			<div style="display:flex;gap:8px;align-items:center;">
+				<img id="user-icon" src="" title="User Menu">
+				<div id="user-menu">
+					<button id="spread-btn">Spread mode</button>
+					<button id="dark-btn">Dark mode</button>
+					<button id="go-trash">Trash</button>
+					<button id="logout-btn">Log out</button>
+				</div>
+			</div>
+		</div>
+		<ul id="trash-list"></ul>
+	</section>
+
+	<section id="view-editor" hidden>
+		<button id="back"> ＜ </button>
+		<input id="title" placeholder="">
+		<div id="editor" contenteditable="true"></div>
+	</section>
+
+	<div id="toast"></div>
+
+	<!-- <div id="preview" class="preview-popup">
+		<div id="preview-content"></div>
+		<button id="copy-note">Copy</button>
+		<button id="delete-note">Delete</button>
+		<button id="close-preview">Close</button>
+	</div> -->
+	<script type="module" src="../script.js"></script>
+
+</body>
+
+</html>
