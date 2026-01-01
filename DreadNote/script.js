@@ -200,7 +200,7 @@ async function loadMemos() {
 			link.style.position = 'absolute';
 			link.style.top = '0';
 			link.style.left = '0';
-			link.style.width = '100%';
+			link.style.width = 'calc(100% - 50px)'; 
 			link.style.height = '100%';
 			link.style.textDecoration = 'none';
 			link.style.color = 'inherit';
