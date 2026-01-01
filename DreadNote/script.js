@@ -193,10 +193,6 @@ async function loadMemos() {
 		.forEach( m => {
 
 			const li = document.createElement( 'li' );
-			li.style.position = 'relative';
-			li.style.display = 'flex';
-li.style.justifyContent = 'space-between';
-li.style.alignItems = 'center';
 
 			/* ========== li 全体を覆う a ========== */
 			const link = document.createElement('a');
@@ -204,7 +200,8 @@ li.style.alignItems = 'center';
 			link.style.position = 'absolute';
 			link.style.top = '0';
 			link.style.left = '0';
-			link.style.width = 'calc(100% - 50px)'; 
+			link.style.right = '50px'; // 右端を 50px 手前までに制限
+			link.style.width = '100%';
 			link.style.height = '100%';
 			link.style.textDecoration = 'none';
 			link.style.color = 'inherit';
@@ -223,7 +220,7 @@ li.style.alignItems = 'center';
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
 			titleSpan.textContent = m.title || 'Untitled';
-			li.appendChild( titleSpan );
+			// li.appendChild( titleSpan );
 			li.appendChild(link);
 
 			/* =====================
@@ -231,8 +228,6 @@ li.style.alignItems = 'center';
 				 ===================== */
 			const rightDiv = document.createElement( 'div' );
 			rightDiv.className = 'memo-right';
-			rightDiv.style.position = 'relative'; // z-index を効かせる
-rightDiv.style.zIndex = '1';          // a の上に表示
 
 			const dateSpan = document.createElement( 'span' );
 			dateSpan.className = 'date-span';
