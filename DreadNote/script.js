@@ -197,7 +197,7 @@ async function loadMemos() {
 			/* ========== li 全体を覆う a ========== */
 			const link = document.createElement('a');
 			link.href = `#/editor/${m.id}`;
-			link.style.position = 'absolute';
+			link.style.position = 'relative';
 			link.style.top = '0';
 			link.style.left = '0';
 			link.style.right = '50px'; // 右端を 50px 手前までに制限
