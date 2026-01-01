@@ -201,10 +201,10 @@ async function loadMemos() {
 			titleLink.href = `#/editor/${m.id}`; // ハッシュ付きフルパス
 			titleLink.textContent = m.title || 'Untitled';
 			titleLink.className = 'memo-title';
-			titleLink.onclick = e => {
-				e.preventDefault(); // デフォルト遷移を止める
-				location.hash = `#/editor/${m.id}`;
-			};
+			// titleLink.onclick = e => {
+				// e.preventDefault(); 
+				// location.hash = `#/editor/${m.id}`;
+			// };
 			li.appendChild(titleLink);
 
 
