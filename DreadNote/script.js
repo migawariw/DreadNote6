@@ -194,18 +194,21 @@ async function loadMemos() {
 
 			const li = document.createElement( 'li' );
 
-			/* =====================
-				 aタグでリンク化
-				 ===================== */
-			const titleLink = document.createElement('a');
-			titleLink.href = `#/editor/${m.id}`; // ハッシュ付きフルパス
-			titleLink.textContent = m.title || 'Untitled';
-			titleLink.className = 'memo-title';
-			// titleLink.onclick = e => {
-				// e.preventDefault(); 
-				// location.hash = `#/editor/${m.id}`;
-			// };
-			li.appendChild(titleLink);
+			/* ========== li 全体を覆う a ========== */
+			const link = document.createElement('a');
+			link.href = `#/editor/${m.id}`;
+			link.style.position = 'absolute';
+			link.style.top = '0';
+			link.style.left = '0';
+			link.style.width = '100%';
+			link.style.height = '100%';
+			link.style.textDecoration = 'none';
+			link.style.color = 'inherit';
+			link.onclick = e => {
+				e.preventDefault();
+				location.hash = `#/editor/${m.id}`;
+			};
+			li.appendChild(link);
 
 
 
