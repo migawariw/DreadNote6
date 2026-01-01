@@ -182,7 +182,8 @@ async function loadMetaOnce() {
 	}
 
 	return metaCache;
-} async function loadMemos() {
+} 
+async function loadMemos() {
 	await loadMetaOnce();
 	memoList.innerHTML = '';
 
@@ -193,12 +194,28 @@ async function loadMetaOnce() {
 
 			const li = document.createElement( 'li' );
 
+			/* =====================
+			   aタグでリンク化
+			   ===================== */
+			const link = document.createElement('a');
+			link.href = `#/editor/${m.id}`; // フルパスにしたい場合は window.location.origin + '/editor/' + m.id
+			link.onclick = e => {
+				e.preventDefault(); // 通常のリンク遷移を止める
+				location.hash = `#/editor/${m.id}`;
+			};
+
+			/* =====================
+			   左側タイトル
+			   ===================== */
+
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
 			titleSpan.textContent = m.title || 'Untitled';
 			li.appendChild( titleSpan );
 
-			/* 右側 */
+			/* =====================
+			   右側（日付 + メニュー）
+			   ===================== */
 			const rightDiv = document.createElement( 'div' );
 			rightDiv.className = 'memo-right';
 
@@ -221,7 +238,7 @@ async function loadMetaOnce() {
 			const copyBtn = document.createElement( 'button' );
 			copyBtn.textContent = '❐';
 			copyBtn.onclick = async ( e ) => {
-				e.stopPropagation();
+				e.stopPropagation();// li / a のクリックを止める
 				const snap = await getDoc(
 					doc( db, 'users', auth.currentUser.uid, 'memos', m.id )
 				);
@@ -250,12 +267,14 @@ async function loadMetaOnce() {
 			};
 
 			rightDiv.append( dateSpan, menuBtn, menuPopup );
+						/* =====================
+			   aタグの中に右側も入れる
+			   ===================== */
 			li.appendChild( rightDiv );
-
-			li.onclick = () => {
-				location.hash = `#/editor/${m.id}`;
-			};
-
+						/* =====================
+			   li に a を追加
+			   ===================== */
+			li.appendChild(link);
 			memoList.appendChild( li );
 		} );
 }
