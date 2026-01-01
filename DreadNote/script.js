@@ -197,11 +197,16 @@ async function loadMemos() {
 			/* =====================
 				 aタグでリンク化
 				 ===================== */
-			const link = document.createElement( 'a' );
-			link.addEventListener( 'click', e => {
-				e.preventDefault();
+			const titleLink = document.createElement('a');
+			titleLink.href = `#/editor/${m.id}`; // ハッシュ付きフルパス
+			titleLink.textContent = m.title || 'Untitled';
+			titleLink.className = 'memo-title';
+			titleLink.onclick = e => {
+				e.preventDefault(); // デフォルト遷移を止める
 				location.hash = `#/editor/${m.id}`;
-			} );
+			};
+			li.appendChild(titleLink);
+
 
 
 			/* =====================
@@ -274,7 +279,6 @@ async function loadMemos() {
 			/* =====================
 	 li に a を追加
 	 ===================== */
-			li.appendChild( link );
 			memoList.appendChild( li );
 		} );
 }
