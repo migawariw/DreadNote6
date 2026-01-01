@@ -1,0 +1,579 @@
+body {
+	margin: 0;
+	padding: 0 20px;
+	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+	font-size: 17px;
+	background: #ffffff;
+	color: #1c1c1e;
+	max-width: 100%;
+	overflow-x: hidden;
+}
+.auth-loading {
+  display: none;
+}
+
+section {
+	max-width: 800px;
+	margin: auto;
+	position: relative;
+}
+
+[hidden] {
+	display: none;
+}
+
+input,
+button {
+	font-size: 17px;
+	margin: 4px 0;
+}
+
+button {
+	color: #0b62e5;
+	border: none;
+}
+
+ul {
+	padding-left: 0;
+	margin: 0;
+}
+
+li {
+	list-style: none;
+	padding: 8px;
+	border-bottom: 1px solid #ddd;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: relative;
+	user-select: none;
+	cursor: default;
+}
+
+li:hover {
+	background: #f2f2f7;
+}
+
+li .memo-title {
+	flex: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin-right: 8px;
+}
+
+.menu-btn,
+.longpress-btn {
+	user-select: none;
+}
+
+#title {
+	border: none;
+	background: transparent;
+	color: inherit;
+	font-size: 21px;
+}
+
+#editor {
+	min-height: 70vh;
+	padding: 0px;
+	outline: none;
+	white-space: pre-wrap;
+	word-break: break-word;
+	border-top: 1px solid #ccc;
+	padding-top: 17px;
+
+	/* iPhoneメモ風 16pxから変更*/
+	font-size: 17px;
+	line-height: 1.75;
+	letter-spacing: 0.025em;
+	color: #1c1c1e;
+	/* iOS標準テキスト色 */
+}
+
+#editor a {
+	color: #1c1c1e;
+	text-decoration: none;
+}
+
+#editor a:hover,
+#editor a:focus,
+#editor a:active {
+	text-decoration: none;
+}
+
+
+img {
+	width: 100%;
+	height: auto;
+	display: block;
+	margin: 8px 0;
+}
+
+/* youtubeとニコニコのみ */
+.video {
+	position: relative;
+	width: 100%;
+	padding-top: 56.25%;
+	margin: 12px 0;
+}
+
+.video iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	margin: 0;
+}
+
+/* TikTok 用（縦長） */
+.tiktok {
+	width: 100%;
+	aspect-ratio: 9/16;
+	max-height: 100vh;
+	margin: 0;
+	/* 余白ゼロ */
+	padding: 0;
+	/* 余白ゼロ */
+	overflow: hidden;
+}
+
+.tiktok iframe {
+	width: 100%;
+	height: 100%;
+	border: 0;
+	display: block;
+	position: absolute;
+	margin: 0;
+}
+
+/* Twitter 用（高さ自動、余白なし） */
+.twitter {
+	width: 100%;
+	padding-top: 0;
+	margin: 0;
+}
+
+.twitter blockquote {
+	margin: 0;
+}
+
+/* Instagram 完全フル幅 */
+.instagram {
+	position: relative;
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	overflow: hidden;
+}
+
+.instagram blockquote,
+.instagram blockquote.instagram-media {
+	margin: 0 !important;
+	padding: 0 !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.instagram iframe {
+	width: 100% !important;
+	min-width: 100% !important;
+	max-width: 100% !important;
+	display: block !important;
+	margin: 0 auto !important;
+	border: 0;
+}
+
+.memo-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.date-span {
+	font-size: 0.7em;
+	color: #666;
+	flex-shrink: 0;
+}
+
+.menu-btn {
+	background: none;
+	border: none;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.menu-popup {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	background: #fff;
+	border: 1px solid #ccc;
+	padding: 4px 0;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	display: none;
+	z-index: 10;
+}
+
+.menu-popup button {
+	width: 100%;
+	text-align: left;
+	padding: 4px 12px;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+.menu-popup button:hover {
+	background: #eee;
+}
+
+#user-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	cursor: pointer;
+	position: relative;
+}
+
+#user-menu {
+	position: absolute;
+	top: 60px;
+	right: 0;
+	background: #ffffff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	display: none;
+	z-index: 100;
+	white-space: nowrap;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	overflow: hidden;
+}
+
+#user-menu button {
+	display: block;
+	width: 100%;
+	padding: 10px 16px;
+	background: none;
+	border: none;
+	text-align: left;
+	font-size: 15px;
+}
+
+#user-menu button:hover {
+	background: #f2f2f7;
+}
+
+#toast {
+	display: none;
+	position: fixed;
+	bottom: 16px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: rgba(0, 0, 0, 0.8);
+	color: #fff;
+	padding: 12px 24px;
+	border-radius: 8px;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+	z-index: 1000;
+}
+
+#toast.show {
+	display: block;
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.preview-popup {
+	display: none;
+	position: fixed;
+	background: #fff;
+	border: 1px solid #333;
+	padding: 8px;
+	z-index: 1000;
+	max-width: 80%;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+button {
+	cursor: pointer;
+	background-color: transparent;
+}
+
+.flex-between {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.longpress-btn {
+	background: #eee;
+	border: 1px solid #ccc;
+	padding: 4px 8px;
+	border-radius: 4px;
+	user-select: none;
+	cursor: pointer;
+}
+
+/* Disable underline on all links (including hover, focus, active, visited) */
+a,
+a:hover,
+a:focus,
+a:active,
+a:visited {
+	text-decoration: none !important;
+}
+
+body.spread {
+	padding: 0px;
+}
+
+/* Dark mode styles */
+body.dark {
+	background: #000;
+	color: #f2f2f7;
+}
+
+body.dark #editor {
+	color: #f2f2f7;
+	border-top-color: #333;
+}
+
+body.dark li {
+	border-bottom-color: #333;
+}
+
+body.dark li:hover {
+	background: #1c1c1e;
+}
+
+body.dark #user-menu {
+	background: #1c1c1e;
+	border-color: #333;
+}
+
+body.dark #user-menu button {
+	color: #f2f2f7;
+}
+
+body.dark #editor a {
+	color: #f2f2f7;
+}
+
+
+/* ボタンの基本サイズ */
+.menu-btn,
+.longpress-btn {
+	font-size: 18px;
+	padding: 6px 12px;
+	border-radius: 6px;
+}
+
+/* ボタン内アイコンのサイズ */
+.menu-btn img,
+.longpress-btn img,
+#user-icon {
+	width: 40px;
+	height: 40px;
+}
+
+/* ドロップダウンメニューのサイズ */
+.menu-popup {
+	padding: 6px 0;
+	border-radius: 6px;
+}
+
+.menu-popup button {
+	font-size: 17px;
+	padding: 8px 16px;
+	border-radius: 6px;
+}
+
+/* ダークモード対応 */
+body.dark .menu-btn,
+body.dark .longpress-btn {
+	background: #1c1c1e;
+	color: #f2f2f7;
+	border-color: #333;
+}
+
+body.dark .menu-popup {
+	background: #1c1c1e;
+	border-color: #333;
+}
+
+body.dark .menu-popup button {
+	color: #f2f2f7;
+}
+
+body.dark .menu-popup button:hover {
+	background: #333;
+}
+
+/* ===== Login Screen ===== */
+
+#view-login {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+#view-login h1 {
+  font-size: 32px;
+  margin-bottom: 32px;
+  letter-spacing: 1px;
+} 
+
+
+/* 通常ボタン */
+#view-login button {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px;
+  margin-top: 10px;
+
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+
+  background: #000;
+  color: #fff;
+  border: 1px solid #fff;
+  transition: transform 0.1s, opacity 0.1s;
+}
+
+/* #view-login button:hover {
+  opacity: 0.9;
+}
+
+#view-login button:active {
+  transform: scale(0.98);
+} */
+
+/* Google ボタン */
+/* #google-login {
+  background: #fff;
+  color: #333;
+  font-weight: 600;
+  margin-top: 18px;
+} */
+
+
+/* @media (max-width: 480px) {
+  #view-login h1 {
+    font-size: 26px;
+  }
+} */
+
+.gsi-material-button {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-appearance: none;
+  background-color: #131314;
+  background-image: none;
+  border: 1px solid #747775;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #e3e3e3;
+  cursor: pointer;
+  font-family: 'Roboto', arial, sans-serif;
+  font-size: 14px;
+  height: 40px;
+  letter-spacing: 0.25px;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: auto;
+  max-width: 400px;
+  min-width: min-content;
+  border-color: #8e918f;
+}
+
+.gsi-material-button .gsi-material-button-icon {
+  height: 20px;
+  margin-right: 10px;
+  min-width: 20px;
+  width: 20px;
+}
+
+.gsi-material-button .gsi-material-button-content-wrapper {
+  -webkit-align-items: center;
+  align-items: center;
+  display: flex;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+
+.gsi-material-button .gsi-material-button-contents {
+  -webkit-flex-grow: 1;
+  flex-grow: 1;
+  font-family: 'Roboto', arial, sans-serif;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+
+.gsi-material-button .gsi-material-button-state {
+  -webkit-transition: opacity .218s;
+  transition: opacity .218s;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.gsi-material-button:disabled {
+  cursor: default;
+  background-color: #13131461;
+  border-color: #8e918f1f;
+}
+
+.gsi-material-button:disabled .gsi-material-button-state {
+  background-color: #e3e3e31f;
+}
+
+.gsi-material-button:disabled .gsi-material-button-contents {
+  opacity: 38%;
+}
+
+.gsi-material-button:disabled .gsi-material-button-icon {
+  opacity: 38%;
+}
+
+.gsi-material-button:not(:disabled):active .gsi-material-button-state, 
+.gsi-material-button:not(:disabled):focus .gsi-material-button-state {
+  background-color: white;
+  opacity: 12%;
+}
+
+.gsi-material-button:not(:disabled):hover {
+  -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
+
+.gsi-material-button:not(:disabled):hover .gsi-material-button-state {
+  background-color: white;
+  opacity: 8%;
+}
