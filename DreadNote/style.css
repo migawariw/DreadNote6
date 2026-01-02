@@ -93,7 +93,7 @@ li .memo-title {
 	color: #666;
 	z-index: 2; /* li より前 */
 	 /* 👇 ここが肝 */
-    margin: -13px -10px -10px -10px;     /* 見た目を上にずらす */
+    margin: -26px -10px -10px -10px;     /* 見た目を上にずらす */
 }
 
 .memo-right {
