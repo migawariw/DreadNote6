@@ -340,6 +340,7 @@ function loadTrash() {
 			// 復元ボタン
 			const restoreBtn = document.createElement( 'button' );
 			restoreBtn.textContent = '↩️';
+			restoreBtn.className = 'menu-btn';
 			restoreBtn.onclick = async e => {
 				e.stopPropagation();
 				await updateMeta( m.id, { deleted: false, updated: Date.now() } );
