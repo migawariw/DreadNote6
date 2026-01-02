@@ -88,7 +88,6 @@ li .memo-title {
 .menu-btn,
 .longpress-btn {
 	user-select: none;
-	font-size: 0.7em;
 	line-height: 0;
 	color: #666;
 	z-index: 2; /* li より前 */
@@ -240,6 +239,12 @@ img {
 .menu-btn:hover,
 .menu-btn:active {
 	background: rgba(0, 0, 0, 0.05);
+	/* border-radius: 9999px; */
+}
+
+body.dark .menu-btn:hover,
+.menu-btn:active {
+	background: rgba(255, 255, 255, 0.05);
 	/* border-radius: 9999px; */
 }
 
@@ -443,7 +448,7 @@ body.dark #editor a {
 /* ダークモード対応 */
 body.dark .menu-btn,
 body.dark .longpress-btn {
-	background: #1c1c1e;
+	/* background: #1c1c1e; */
 	color: #f2f2f7;
 	border-color: #333;
 }
