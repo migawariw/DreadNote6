@@ -371,7 +371,7 @@ body.dark #editor a {
 	font-size: 18px;
 	padding: 6px 12px;
 	border-radius: 6px;
-	position: absolute;
+	/* position: absolute; */
 	z-index: 2;
 }
 
