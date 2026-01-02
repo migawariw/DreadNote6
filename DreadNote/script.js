@@ -1,7 +1,7 @@
 import { getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, setDoc, getDoc, deleteDoc} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 let metaCache = null;        // ← 目次箱
 const memoCache = {};       // ← 本文キャッシュ
@@ -362,11 +362,7 @@ function loadTrash() {
 			delBtn.onclick = async e => {
 				e.stopPropagation();
 				// Firestoreのドキュメントを削除
-				await setDoc(
-					doc( db, 'users', auth.currentUser.uid, 'memos', m.id ),
-					{}, // 空オブジェクトで上書き（必要に応じて deleteDoc に変更可）
-					{ merge: true }
-				);
+				 await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'memos', m.id));
 				// meta からも削除
 				metaCache.memos = metaCache.memos.filter( mm => mm.id !== m.id );
 				await saveMeta();
@@ -691,6 +687,32 @@ async function navigate() {
 		await loadMetaOnce();           // trash だけ
 		show( 'trash' );
 		loadTrash();
+
+		// ★ Empty Trash ボタンの設定 ★
+	const emptyTrashBtn = document.getElementById('empty-trash-btn');
+	if (emptyTrashBtn) {
+		emptyTrashBtn.onclick = async () => {
+			if (!metaCache || !Array.isArray(metaCache.memos)) return;
+
+			// ★ 確認ダイアログ ★
+		const ok = confirm("Trash内のすべてのメモを完全削除します。本当によろしいですか？");
+		if (!ok) return; // キャンセルなら何もしない
+
+			const trashMemos = metaCache.memos.filter(m => m.deleted);
+			for (const m of trashMemos) {
+				 // 完全削除
+      await deleteDoc(doc(db, 'users', auth.currentUser.uid, 'memos', m.id));
+    }
+
+
+			// meta からも削除
+			metaCache.memos = metaCache.memos.filter(m => !m.deleted);
+			await saveMeta();
+
+			loadTrash();
+			showToast('Trash emptied');
+		};
+	}
 
 	} else {
 		await loadMetaOnce();           // list だけ
