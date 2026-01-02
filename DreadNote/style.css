@@ -57,7 +57,7 @@ ul {
 
 li {
 	list-style: none;
-	padding: 8px;
+	padding: 8px 8px 8px 8px;
 	border-bottom: 1px solid #ddd;
 	display: flex;
 	justify-content: space-between;
@@ -93,8 +93,7 @@ li .memo-title {
 	color: #666;
 	z-index: 2; /* li より前 */
 	 /* 👇 ここが肝 */
-    margin-top: -10px;     /* 見た目を上にずらす */
-    padding-top: 16px;    
+    margin: -13px -10px -10px -10px;     /* 見た目を上にずらす */
 }
 
 .memo-right {
@@ -232,10 +231,16 @@ img {
 
 
 .menu-btn {
-	background: none;
-	border: none;
+/* background: rgba(0, 0, 0, 0.35); ← ここだけ薄く */
+    border: none;
 	font-size: 16px;
 	cursor: pointer;
+}
+/* 触った時だけ枠が出る */
+.menu-btn:hover,
+.menu-btn:active {
+	background: rgba(0, 0, 0, 0.05);
+	/* border-radius: 9999px; */
 }
 
 .menu-popup {
