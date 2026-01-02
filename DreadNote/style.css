@@ -8,20 +8,7 @@ body {
 	max-width: 100%;
 	overflow-x: hidden;
 }
-.logo-title {
-    display: flex;
-    align-items: center; /* h2 と画像を縦中央揃え */
-    gap: 8px;            /* h2 と画像の間隔 */
-}
 
-.logo-title .logo-img {
-    height: 32px;   /* 高さを揃える */
-    width: auto;    /* アスペクト比を維持 */
-	border-radius: 50%;  /* 丸くする */
-    object-fit: cover;   /* 画像の比率を維持してはみ出し部分をカット */
-	border: 1px solid #000000;
-	/* box-shadow: 0 2px 6px rgba(0,0,0,0.3);  */
-}
 .auth-loading {
   display: none;
 }
@@ -227,42 +214,42 @@ img {
 
 
 
-#view-list .flex-between {
-    position: sticky;
-    top: 0;
 
-    background: #fff;
-    z-index: 10;
-
-    /* padding: 12px 0; */
+.logo-img {
+    /* height: 80px;    */
+    /* width: auto;    */
+	border-radius: 50%;
+	/* border: 1px solid #ffffff; */
+	box-shadow: 0 2px 6px rgba(0,0,0,0.5); 
 }
-body.dark #view-list .flex-between {
-    background: #000;
+body.dark .logo-img{
+	border: 2px solid #ffffff;
 }
-#new-memo-2 {
+#new-memo {
     position: fixed;
-    right: 30px;
-    bottom: 30px;
+    right: 20px;
+    bottom: 20px;
 
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
 
     font-size: 40px;
     line-height: 1;
+	opacity: 0.9;
 
-    background: rgba(186, 186, 186, 0.5);
-    color: #fff;
+    /* background: rgba(186, 186, 186, 0.5); */
+    /* color: #fff; */
     border: none;
 font-weight: 200;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    /* box-shadow: 0 6px 12px rgba(0,0,0,0.9); */
     cursor: pointer;
 
     z-index: 1000;
 }
-body.dark #new-memo-2 {
-	background: rgba(78, 78, 78, 0.5);
-}
+/* body.dark #new-memo-2 { */
+	/* background: rgba(78, 78, 78, 0.5); */
+/* } */
 .menu-btn {
 /* background: rgba(0, 0, 0, 0.35); ← ここだけ薄く */
     border: none;
@@ -308,15 +295,20 @@ body.dark .menu-btn:hover,
 }
 
 #user-icon {
-	width: 32px;
-	height: 32px;
+	position: fixed;
+    
+    z-index: 10000;
+    background: transparent;
+	width: 40px;
+	height: 40px;
+	top: 10px;
+    right: 16px;
 	border-radius: 50%;
 	cursor: pointer;
-	position: relative;
 }
 
 #user-menu {
-	position: absolute;
+	position: fixed;
 	top: 60px;
 	right: 0;
 	background: #ffffff;
@@ -386,6 +378,7 @@ button {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	/* margin-bottom: 0; */
 }
 
 .longpress-btn {
@@ -459,12 +452,9 @@ body.dark #editor a {
 }
 
 /* ボタン内アイコンのサイズ */
-.menu-btn img,
-.longpress-btn img,
-#user-icon {
-	width: 40px;
-	height: 40px;
-}
+/* .menu-btn img,
+.longpress-btn img, */
+
 
 /* ドロップダウンメニューのサイズ */
 .menu-popup {
