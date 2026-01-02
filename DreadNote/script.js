@@ -297,22 +297,45 @@ function loadTrash() {
 		.forEach( m => {
 			const li = document.createElement( 'li' );
 
-			// タイトル
+/* ========== li 全体を覆う a ========== */
+			const link = document.createElement('a');
+			link.href = `#/editor/${m.id}`;
+			link.style.position = 'absolute';
+			link.style.top = '0';
+			link.style.left = '0';
+			link.style.width = '100%';
+			link.style.height = '100%';
+			link.style.textDecoration = 'none';
+			link.style.color = 'inherit';
+			link.onclick = e => {
+				e.preventDefault();
+				location.hash = `#/editor/${m.id}`;
+			};
+			li.appendChild(link);
+
+						/* =====================
+				 左側タイトル
+				 ===================== */
+
 			const titleSpan = document.createElement( 'span' );
+			titleSpan.className = 'memo-title';
 			titleSpan.textContent = m.title || 'Untitled';
 			li.appendChild( titleSpan );
 
 			// 右側の操作領域
+/* =====================
+				 右側（日付 + メニュー）
+				 ===================== */
 			const rightDiv = document.createElement( 'div' );
 			rightDiv.className = 'memo-right';
 
-			// 日付表示
 			const dateSpan = document.createElement( 'span' );
 			dateSpan.className = 'date-span';
-			dateSpan.textContent = new Date( m.updated ).toLocaleString( 'ja-JP', {
-				year: 'numeric', month: '2-digit', day: '2-digit',
-				hour: '2-digit', minute: '2-digit'
-			} );
+			dateSpan.textContent =
+				new Date( m.updated ).toLocaleString( 'ja-JP', {
+					year: 'numeric', month: '2-digit', day: '2-digit',
+					hour: '2-digit', minute: '2-digit'
+				} );
 
 			// 復元ボタン
 			const restoreBtn = document.createElement( 'button' );
@@ -326,7 +349,7 @@ function loadTrash() {
 
 			// ⋯ メニュー
 			const menuBtn = document.createElement( 'button' );
-			menuBtn.textContent = '⋯';
+			menuBtn.textContent = '❌';
 			menuBtn.className = 'menu-btn';
 
 			const menuPopup = document.createElement( 'div' );
