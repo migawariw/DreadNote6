@@ -8,6 +8,20 @@ body {
 	max-width: 100%;
 	overflow-x: hidden;
 }
+.logo-title {
+    display: flex;
+    align-items: center; /* h2 と画像を縦中央揃え */
+    gap: 8px;            /* h2 と画像の間隔 */
+}
+
+.logo-title .logo-img {
+    height: 32px;   /* 高さを揃える */
+    width: auto;    /* アスペクト比を維持 */
+	border-radius: 50%;  /* 丸くする */
+    object-fit: cover;   /* 画像の比率を維持してはみ出し部分をカット */
+	border: 1px solid #000000;
+	/* box-shadow: 0 2px 6px rgba(0,0,0,0.3);  */
+}
 .auth-loading {
   display: none;
 }
@@ -44,10 +58,10 @@ li {
 	border-bottom: 1px solid #ddd;
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
 	position: relative;
 	user-select: none;
 	cursor: default;
+	flex-direction: column; /* これを追加 */
 }
 
 li:hover {
@@ -55,16 +69,31 @@ li:hover {
 }
 
 li .memo-title {
+	font-weight: 610;  
 	flex: 1;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	margin-right: 8px;
 }
+.date-span {
+	font-size: 0.7em;
+	color: #666;
+	flex-shrink: 0;
+}
 
 .menu-btn,
 .longpress-btn {
 	user-select: none;
+	font-size: 0.7em;
+	line-height: 0;
+}
+.memo-right {
+	display: flex;
+	justify-content: space-between; /* 左に日付、右に…ボタン */
+	/* align-items: center; */
+	width: 100%;
+	line-height: 2;
 }
 
 #title {
@@ -84,8 +113,8 @@ li .memo-title {
 	padding-top: 17px;
 
 	/* iPhoneメモ風 16pxから変更*/
-	font-size: 17px;
-	line-height: 1.75;
+	font-size: 16.5px;
+	line-height: 1.38;
 	letter-spacing: 0.025em;
 	color: #1c1c1e;
 	/* iOS標準テキスト色 */
@@ -185,17 +214,9 @@ img {
 	border: 0;
 }
 
-.memo-right {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
 
-.date-span {
-	font-size: 0.7em;
-	color: #666;
-	flex-shrink: 0;
-}
+
+
 
 .menu-btn {
 	background: none;
@@ -217,7 +238,8 @@ img {
 }
 
 .menu-popup button {
-	width: 100%;
+	width: auto;
+	/* width: 100%; */
 	text-align: left;
 	padding: 4px 12px;
 	background: none;
@@ -346,6 +368,9 @@ body.dark #editor {
 body.dark li {
 	border-bottom-color: #333;
 }
+body.dark .date-span {
+	color: #aaa9a9;
+}
 
 body.dark li:hover {
 	background: #1c1c1e;
@@ -359,7 +384,9 @@ body.dark #user-menu {
 body.dark #user-menu button {
 	color: #f2f2f7;
 }
-
+body.dark #user-menu button:hover {
+	background: #24242e;
+}
 body.dark #editor a {
 	color: #f2f2f7;
 }
