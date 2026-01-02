@@ -227,8 +227,42 @@ img {
 
 
 
+#view-list .flex-between {
+    position: sticky;
+    top: 0;
 
+    background: #fff;
+    z-index: 10;
 
+    /* padding: 12px 0; */
+}
+body.dark #view-list .flex-between {
+    background: #000;
+}
+#new-memo-2 {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+
+    font-size: 40px;
+    line-height: 1;
+
+    background: rgba(186, 186, 186, 0.5);
+    color: #fff;
+    border: none;
+font-weight: 200;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+
+    z-index: 1000;
+}
+body.dark #new-memo-2 {
+	background: rgba(78, 78, 78, 0.5);
+}
 .menu-btn {
 /* background: rgba(0, 0, 0, 0.35); ← ここだけ薄く */
     border: none;
@@ -245,7 +279,6 @@ img {
 body.dark .menu-btn:hover,
 .menu-btn:active {
 	background: rgba(255, 255, 255, 0.05);
-	/* border-radius: 9999px; */
 }
 
 .menu-popup {

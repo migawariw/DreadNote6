@@ -408,6 +408,7 @@ function showEditor( data ) {
 	titleInput.value = data.title || '';
 	editor.innerHTML = data.content || '<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>';
 	show( 'editor' );
+	window.scrollTo(0, 0);
 }
 let saveTimer = null;
 
@@ -669,6 +670,8 @@ document.getElementById( 'new-memo' ).onclick = async () => {
 	// エディタへ
 	location.hash = `#/editor/${ref.id}`;
 };
+document.getElementById('new-memo-2').onclick =
+    document.getElementById('new-memo').onclick;
 /* Navigation */
 async function navigate() {
 	if ( !auth.currentUser ) {
