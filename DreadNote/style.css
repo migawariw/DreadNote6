@@ -46,7 +46,10 @@ button {
 	color: #0b62e5;
 	border: none;
 }
-
+#back{
+	color: #8b8b8b;
+	font-size: 17px;
+}
 ul {
 	padding-left: 0;
 	margin: 0;
@@ -79,7 +82,7 @@ li .memo-title {
 .date-span {
 	font-size: 0.7em;
 	color: #666;
-	flex-shrink: 0;
+	/* flex-shrink: 0; */
 }
 
 .menu-btn,
@@ -87,7 +90,13 @@ li .memo-title {
 	user-select: none;
 	font-size: 0.7em;
 	line-height: 0;
+	color: #666;
+	z-index: 2; /* li より前 */
+	 /* 👇 ここが肝 */
+    margin-top: -10px;     /* 見た目を上にずらす */
+    padding-top: 16px;    
 }
+
 .memo-right {
 	display: flex;
 	justify-content: space-between; /* 左に日付、右に…ボタン */
@@ -97,10 +106,14 @@ li .memo-title {
 }
 
 #title {
+	width: 85%;  
 	border: none;
+	outline: none;  
 	background: transparent;
 	color: inherit;
-	font-size: 21px;
+	font-size: 17px;
+	line-height: 1.5;
+	font-weight: 610;
 }
 
 #editor {

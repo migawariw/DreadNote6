@@ -237,7 +237,7 @@ async function loadMemos() {
 
 			/* ⋯ メニュー */
 			const menuBtn = document.createElement( 'button' );
-			menuBtn.textContent = '⋯';
+			menuBtn.textContent = '⁝';
 			menuBtn.className = 'menu-btn';
 
 			const menuPopup = document.createElement( 'div' );
