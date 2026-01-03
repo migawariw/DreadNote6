@@ -29,7 +29,7 @@ section {
 
 input,
 button {
-	font-size: 17px;
+	font-size: 1rem;
 	margin: 4px 0;
 }
 
@@ -117,7 +117,7 @@ li .memo-title {
 	/* iPhoneメモ風 16pxから変更*/
 	font-size: 1rem;
 	line-height: 1.38;
-	letter-spacing: 0.025em;
+	letter-spacing: 0.025rem;
 	color: #1c1c1e;
 	/* iOS標準テキスト色 */
 }
@@ -467,7 +467,7 @@ body.dark #editor a {
 }
 
 .menu-popup button {
-	font-size: 17px;
+	font-size: 1rem;
 	padding: 8px 16px;
 	border-radius: 6px;
 }
