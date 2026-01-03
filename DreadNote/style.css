@@ -1,4 +1,5 @@
 html {
+	-webkit-text-size-adjust: auto;
   font-size: 100%; /* ブラウザのユーザー設定を尊重 */
 }
 
