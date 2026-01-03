@@ -2,7 +2,7 @@ body {
 	margin: 0;
 	padding: 0 20px;
 	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-	font-size: 17px;
+	font-size: 1rem;
 	background: #ffffff;
 	color: #1c1c1e;
 	max-width: 100%;
@@ -96,7 +96,7 @@ li .memo-title {
 	outline: none;  
 	background: transparent;
 	color: inherit;
-	font-size: 17px;
+	font-size: 1rem;
 	line-height: 1.5;
 	font-weight: 610;
 }
@@ -111,7 +111,7 @@ li .memo-title {
 	padding-top: 17px;
 
 	/* iPhoneメモ風 16pxから変更*/
-	font-size: 16.5px;
+	font-size: 1rem;
 	line-height: 1.38;
 	letter-spacing: 0.025em;
 	color: #1c1c1e;
