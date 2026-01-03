@@ -2,6 +2,9 @@ html {
 	-webkit-text-size-adjust: auto;
   font-size: 100%; /* ブラウザのユーザー設定を尊重 */
 }
+h1{
+	font-size: 10rem;
+}
 
 body {
 	margin: 0;
