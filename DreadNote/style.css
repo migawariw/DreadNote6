@@ -1,3 +1,7 @@
+html {
+  font-size: 100%; /* ブラウザのユーザー設定を尊重 */
+}
+
 body {
 	margin: 0;
 	padding: 0 20px;
