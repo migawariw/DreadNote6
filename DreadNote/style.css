@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	padding: 0 20px;
+	padding: 0 20px 250px 20px;
 	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 	font-size: 17px;
 	background: #ffffff;
@@ -237,7 +237,6 @@ body.dark .logo-img{
     font-size: 40px;
     line-height: 1;
 	opacity: 0.9;
-
     /* background: rgba(186, 186, 186, 0.5); */
     /* color: #fff; */
     border: none;
@@ -247,6 +246,15 @@ font-weight: 200;
 
     z-index: 1000;
 }
+
+/* ビューポートが親幅を超える場合に調整 */
+@media (min-width: 800px) {
+    #new-memo {
+        /* 親要素右端から16px */
+        right: calc((100% - 800px)/2 + 20px);
+    }
+}
+
 /* body.dark #new-memo-2 { */
 	/* background: rgba(78, 78, 78, 0.5); */
 /* } */
@@ -296,21 +304,28 @@ body.dark .menu-btn:hover,
 
 #user-icon {
 	position: fixed;
-    
     z-index: 10000;
     background: transparent;
 	width: 40px;
 	height: 40px;
 	top: 10px;
-    right: 16px;
+    /* right: 16px; */
+	right: calc((100% - 800px)/2 + 16px); /* 親の右端から16px */
 	border-radius: 50%;
 	cursor: pointer;
 }
+/* モバイルなど画面幅 < 800px の場合は右端16px固定 */
+@media (max-width: 799px) {
+    #user-icon {
+        right: 16px;
+    }
+}
+
 
 #user-menu {
 	position: fixed;
 	top: 60px;
-	right: 0;
+	right: calc((100% - 800px)/2 + 0px); /* 親の右端から16px */
 	background: #ffffff;
 	border: 1px solid #ddd;
 	border-radius: 8px;
@@ -319,6 +334,12 @@ body.dark .menu-btn:hover,
 	white-space: nowrap;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	overflow: hidden;
+}
+/* モバイルなど画面幅 < 800px の場合は右端16px固定 */
+@media (max-width: 799px) {
+    #user-menu {
+        right: 0px;
+    }
 }
 
 #user-menu button {
