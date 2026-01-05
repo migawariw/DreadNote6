@@ -7,6 +7,17 @@
 	<link rel="icon" href="../icon/img3.png" type="image/png">
 	<link rel="apple-touch-icon" href="../icon/img3.png">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script>
+(function () {
+  try {
+    if (localStorage.getItem('dreadnote-dark') === '1') {
+      document.documentElement.style.backgroundColor = '#000';
+      document.documentElement.style.colorScheme = 'dark';
+      document.body && (document.body.style.backgroundColor = '#000');
+    }
+  } catch (e) {}
+})();
+</script>
 	<link rel="stylesheet" href="../style.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 	<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -34,6 +45,7 @@
 					<button id="spread-btn">Spread mode</button>
 					<button id="dark-btn">Dark mode</button>
 					<button id="go-trash">Trash</button>
+					<!-- <button id="switch-account">Switch account</button> -->
 					<button id="logout-btn">Log out</button>
 				</div>
 			</div>
