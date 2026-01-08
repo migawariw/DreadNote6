@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	padding: 0 20px 300px 20px;
+	padding: 20px 20px 300px 20px;
 	font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
 	font-size: 17px;
 	background: #ffffff;
@@ -9,9 +9,49 @@ body {
 	overflow-x: hidden;
 }
 
+
 .auth-loading {
   display: none;
 }
+/* ===== フォントサイズポップアップ（ズレ防止） ===== */
+#font-size-popup {
+    display: none;
+    position: fixed;
+    top: 56px;
+	left: 20px;
+    right: 20px;
+    font-size: 18px;          /* ← bodyの影響を切る */
+    line-height: 1;
+    border: 1px solid #ccc;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 10000;
+}
+
+/* ===== スライダー行（高さ完全固定） ===== */
+#font-slider-wrap {
+    height: 80px;             /* ← 絶対固定 */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;          /* ← 継承遮断 */
+    line-height: 1;
+    overflow: hidden;
+}
+
+/* サイズ表示 */
+#font-size-value {
+    font-size: 20px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* ===== スライダー本体 ===== */
+#font-size-slider {
+	width: 80%;
+}
+
+
 
 section {
 	max-width: 800px;
@@ -44,7 +84,6 @@ ul {
 
 li {
 	list-style: none;
-	padding: 8px 8px 8px 8px;
 	border-bottom: 1px solid #ddd;
 	display: flex;
 	justify-content: space-between;
@@ -52,13 +91,23 @@ li {
 	user-select: none;
 	cursor: default;
 	flex-direction: column; /* これを追加 */
+    padding: 8px 12px; /* paddingは最後に書く必要があるらしい*/
+
+}
+
+
+li a {
+    flex: 1; /* li 全体を覆う */
+    text-decoration: none;
+    color: inherit;
 }
 
 li:hover {
-	background: #f2f2f7;
+	background: #fcfcfc;
 }
 
 li .memo-title {
+	/* font-size: 1em; */
 	font-weight: 610;  
 	flex: 1;
 	white-space: nowrap;
@@ -103,11 +152,12 @@ li .memo-title {
 
 #editor {
 	min-height: 70vh;
-	padding: 0px;
+	padding-top: 100px;
 	outline: none;
 	white-space: pre-wrap;
 	word-break: break-word;
-	border-top: 1px solid #ccc;
+	border-top: none;
+	/* border-top: 1px solid #ccc; */
 	padding-top: 17px;
 
 	/* iPhoneメモ風 16pxから変更*/
@@ -345,8 +395,8 @@ body.dark .menu-btn:hover,
 #user-menu {
 	position: absolute;
 	/* position: fixed; */
-	top: 60px;
-	right: calc((100% - 800px)/2 + 0px); /* 親の右端から16px */
+	top: 70px;
+	right: 0px; /* 親の右端から16px */
 	background: #ffffff;
 	border: 1px solid #ddd;
 	border-radius: 8px;
@@ -420,6 +470,7 @@ button {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	padding-left: 10px;
 	/* margin-bottom: 0; */
 }
 
@@ -446,6 +497,9 @@ body.spread {
 	padding-right: 0;
 }
 
+body.spread section {
+	max-width: 100%;
+}
 /* Dark mode styles */
 body.dark {
 	background: #000;
@@ -465,7 +519,7 @@ body.dark .date-span {
 }
 
 body.dark li:hover {
-	background: #1c1c1e;
+	background: #101010;
 }
 
 body.dark #user-menu {

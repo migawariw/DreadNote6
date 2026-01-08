@@ -22,9 +22,51 @@ const views = { login: document.getElementById( 'view-login' ), list: document.g
 const memoList = document.getElementById( 'memo-list' );
 const trashList = document.getElementById( 'trash-list' );
 const editor = document.getElementById( 'editor' );
-const titleInput = document.getElementById( 'title' );
+// const titleInput = document.getElementById( 'title' );
 const userIcon = document.getElementById( 'user-icon' );
 const userMenu = document.getElementById( 'user-menu' );
+
+const fontBtn = document.getElementById('font-size-btn');
+const fontPopup = document.getElementById('font-size-popup');
+const fontSlider = document.getElementById('font-size-slider');
+const fontValue = document.getElementById('font-size-value');
+const editorEl = document.getElementById('editor');
+
+// ポップアップ表示トグル
+fontBtn.onclick = e => {
+    e.stopPropagation();
+    fontPopup.style.display = (fontPopup.style.display === 'block') ? 'none' : 'block';
+		userMenu.style.display = 'none';
+};
+
+// スライダーで文字サイズ変更
+fontSlider.oninput = e => {
+    const size = fontSlider.value + 'px';
+		    // body全体に文字サイズを反映
+    document.body.style.fontSize = size;
+    editorEl.style.fontSize = size;
+		memoList.querySelectorAll('li').forEach(li => {
+        li.style.fontSize = size;              // 一覧も反映
+    });
+    fontValue.textContent = size;
+    localStorage.setItem('dreadnote-font-size', fontSlider.value);
+};
+
+// 初期値を保存から反映
+const savedSize = localStorage.getItem('dreadnote-font-size');
+if (savedSize) {
+    editorEl.style.fontSize = savedSize + 'px';
+    fontSlider.value = savedSize;
+    fontValue.textContent = savedSize + 'px';
+		memoList.querySelectorAll('li').forEach(li => li.style.fontSize = savedSize + 'px');
+}
+
+// ポップアップ外クリックで閉じる
+document.addEventListener('click', e => {
+    if (!fontPopup.contains(e.target) && e.target !== fontBtn) {
+        fontPopup.style.display = 'none';
+    }
+});
 
 // Dark mode toggle
 const darkBtn = document.getElementById( 'dark-btn' );
@@ -187,6 +229,7 @@ async function loadMemos() {
 		.forEach( m => {
 
 			const li = document.createElement( 'li' );
+			li.style.fontSize = savedSize + 'px'; // ← 一覧に反映
 
 			/* ========== li 全体を覆う a ========== */
 			const link = document.createElement( 'a' );
@@ -198,6 +241,7 @@ async function loadMemos() {
 			link.style.height = '100%';
 			link.style.textDecoration = 'none';
 			link.style.color = 'inherit';
+			link.style.fontSize = savedSize;
 			link.onclick = e => {
 				e.preventDefault();
 				location.hash = `#/editor/${m.id}`;
@@ -212,7 +256,8 @@ async function loadMemos() {
 
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
-			titleSpan.textContent = m.title || 'Untitled';
+			titleSpan.textContent = m.title || 'Logged at';
+			// titleSpan.style.fontSize = savedSize;
 			li.appendChild( titleSpan );
 
 			/* =====================
@@ -313,7 +358,7 @@ function loadTrash() {
 
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
-			titleSpan.textContent = m.title || 'Untitled';
+			titleSpan.textContent = m.title || 'Logged at';
 			li.appendChild( titleSpan );
 
 			// 右側の操作領域
@@ -393,8 +438,32 @@ async function openEditor( id ) {
 }
 
 async function showEditor( data ) {
-	titleInput.value = data.title || '';
-	editor.innerHTML = data.content || '';
+ // 既存タイトルを本文の1行目に追加
+const content = data.content || '';
+
+// // 既存タイトルがあれば先頭行に追加
+// if (data.title && !content.startsWith(data.title)) {
+//     // 1行目として <div> または <p> にするのが安全
+//     content = `<div>${data.title}</div>` + content;
+// }
+
+// 改行を <div> に変換してセット
+    editor.innerHTML = content
+        .split('\n')
+        .map(line => line || '<div><br></div>')  // 空行も div に変換
+        .join('');
+				editor.style.fontSize = savedSize + 'px';
+
+    // カーソルを先頭に移動
+    const firstLine = editor.firstChild;
+    if (firstLine) {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(firstLine);
+        range.collapse(true); // 先頭にセット
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
 
 	// =================================
 	// 追加: editor 内の [Image] を Firestore から Base64 に置き換える
@@ -426,28 +495,89 @@ function debounceSave() {
 	saveTimer = setTimeout( saveMemo, 500 );
 }
 
-titleInput.addEventListener( 'input', debounceSave );
+// titleInput.addEventListener( 'input', debounceSave );
 editor.addEventListener( 'input', debounceSave );
+editor.addEventListener('input', () => {
+    if (!currentMemoId) return;
+    const lines = editor.innerText.split('\n');
+    const title = lines[0].trim();
+    const meta = getMeta(currentMemoId);
+    if (meta && meta.title !== title) {
+        updateMeta(currentMemoId, { title });
+    }
+});
+
+// ===== Italic → h2 変換 =====
+editor.addEventListener('beforeinput', e => {
+  if (e.inputType === 'formatItalic') {
+    e.preventDefault();
+
+    // 選択範囲 or カーソル位置を h2 に
+    document.execCommand('formatBlock', false, 'h2');
+
+    // 念のため i / em が残ってたら剥がす
+    editor.querySelectorAll('i, em').forEach(el => {
+      el.replaceWith(...el.childNodes);
+    });
+
+    // 保存トリガー
+    editor.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+});
+
+editor.addEventListener('keydown', e => {
+  const sel = document.getSelection();
+  if (!sel.rangeCount) return;
+
+  // カーソル直前のテキストを取得
+  const range = sel.getRangeAt(0);
+  const node = range.startContainer;
+  const offset = range.startOffset;
+
+  if (node.nodeType === 3) { // テキストノード
+    const text = node.textContent;
+    // ^_^ が直前にあるか？
+    if (text.slice(offset - 3, offset) === '^_^') {
+      e.preventDefault();
+
+      // ^_^ を削除
+      node.deleteData(offset - 3, 3);
+
+      // 選択範囲を h2 に
+      document.execCommand('formatBlock', false, 'h2');
+
+      // 念のため i/em を剥がす
+      editor.querySelectorAll('i, em').forEach(el => el.replaceWith(...el.childNodes));
+
+      // 保存トリガー
+      editor.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+});
+editor.addEventListener('keydown', e => {
+    // Windows: Ctrl+I / Mac: Cmd+I
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
+        e.preventDefault(); // ブラウザのデフォルト動作を止める
+        document.execCommand('italic'); // 選択中をイタリックに
+    }
+});
 
 async function saveMemo() {
-	if ( !currentMemoId ) return;
+    if (!currentMemoId) return;
 
-	const title =
-		titleInput.value.trim() ||
-		editor.innerText.split( '\n' )[0]?.trim() || '';
+    const lines = editor.innerText.split('\n');
+    const title = lines[0].trim();       // 1行目をタイトルに
+    const content = editor.innerHTML;    // 本文全体はHTMLで保存
 
-	const content = editor.innerHTML;
-	const updated = Date.now();
+    memoCache[currentMemoId] = { title, content, updated: Date.now() };
 
-	memoCache[currentMemoId] = { title, content, updated };
+    await setDoc(
+        doc(db, 'users', auth.currentUser.uid, 'memos', currentMemoId),
+        { content, updated: Date.now() },
+        { merge: true }
+    );
 
-	await setDoc(
-		doc( db, 'users', auth.currentUser.uid, 'memos', currentMemoId ),
-		{ title, content, updated },
-		{ merge: true }
-	);
-
-	await updateMeta( currentMemoId, { title, updated } );
+    await updateMeta(currentMemoId, { title, updated: Date.now() });
 }
 
 async function saveMeta() {
@@ -507,7 +637,7 @@ editor.addEventListener( 'paste', async e => {
 
 		const img = document.createElement( 'img' );
 		img.src = blobUrl;
-		img.alt = 'pasted image';
+		// img.alt = 'pasted image';
 		if ( originalUrl ) img.dataset.url = originalUrl;
 		if ( isEmbed ) img.dataset.embed = '1';
 
@@ -591,6 +721,8 @@ const originalSizeStr = formatSize(originalSizeBytes);
 
 // alert 表示
 alert(`${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG loops: ${loopCount}`);
+showToast(`${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG loops: ${loopCount}`);
+
 
 				insertImageFromBase64( base64, filename, true );
 			};
