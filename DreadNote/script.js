@@ -441,11 +441,7 @@ async function showEditor( data ) {
  // 既存タイトルを本文の1行目に追加
 const content = data.content || '';
 
-// // 既存タイトルがあれば先頭行に追加
-// if (data.title && !content.startsWith(data.title)) {
-//     // 1行目として <div> または <p> にするのが安全
-//     content = `<div>${data.title}</div>` + content;
-// }
+
 
 // 改行を <div> に変換してセット
     editor.innerHTML = content
@@ -483,6 +479,22 @@ const content = data.content || '';
 	// =================================
 
 	show( 'editor' );
+	 // ===== ここで最初に文字がある行をタイトルにして保存 =====
+    if (currentMemoId) {
+        const lines = editor.innerText.split('\n');
+        let title = '';
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed) {
+                title = trimmed;
+                break;
+            }
+        }
+        const meta = getMeta(currentMemoId);
+        if (meta && meta.title !== title) {
+            await updateMeta(currentMemoId, { title });
+        }
+    }
 	window.scrollTo( 0, 0 );
 }
 
@@ -499,8 +511,20 @@ function debounceSave() {
 editor.addEventListener( 'input', debounceSave );
 editor.addEventListener('input', () => {
     if (!currentMemoId) return;
+
+    // 各行を取得
     const lines = editor.innerText.split('\n');
-    const title = lines[0].trim();
+
+    // 最初に文字が含まれる行を探す
+    let title = '';
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed) { // 空行でなければタイトルに
+            title = trimmed;
+            break;
+        }
+    }
+
     const meta = getMeta(currentMemoId);
     if (meta && meta.title !== title) {
         updateMeta(currentMemoId, { title });
