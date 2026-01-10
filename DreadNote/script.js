@@ -1,78 +1,102 @@
-import { getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// 0️⃣ モジュールのインポート
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getRedirectResult } from
-	"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDocs, getFirestore, collection, addDoc, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+//1️⃣ Firebase 初期化・キャッシュ
+// RAMに一時的に保存（リロードで消える）
 let metaCache = null;        // ← 目次箱
 const memoCache = {};       // ← 本文キャッシュ
 
-/* Firebase初期化 */
+// firebase
 const firebaseConfig = { apiKey: "AIzaSyCdDf0GH80PoGlcbk2yjlaVQfP01Gk9m18", authDomain: "noteeditor-ba1db.firebaseapp.com", projectId: "noteeditor-ba1db" };
+// ✅ 呼び出しの可能性あり（内部で軽くプロジェクト確認など）
 const app = initializeApp( firebaseConfig );
+// ❌ ローカルオブジェクト作成のみ → 通信なし
 const auth = getAuth( app );
+// ❌ ローカルオブジェクト作成のみ → 通信なし
 const db = getFirestore( app );
+// ✅ 確実に呼び出し発生（サーバーに問い合わせて認証確認）
 getRedirectResult( auth ).catch( () => { } );
 
-/* DOM要素 */
+/* 2️⃣DOM要素格納 このブロックはFirebaseへの通信無し*/
+// すなわちHTML内の各要素（ログイン画面、一覧画面、ゴミ箱画面、エディター画面）を変数に格納する
 const views = { login: document.getElementById( 'view-login' ), list: document.getElementById( 'view-list' ), trash: document.getElementById( 'view-trash' ), editor: document.getElementById( 'view-editor' ) };
-// const emailInput = document.getElementById( 'email' );
-// const passwordInput = document.getElementById( 'password' );
+//メモ一覧、ゴミ箱、エディター、ユーザーアイコン、メニュー等を表示する要素を取得している
 const memoList = document.getElementById( 'memo-list' );
 const trashList = document.getElementById( 'trash-list' );
 const editor = document.getElementById( 'editor' );
-// const titleInput = document.getElementById( 'title' );
+editor.contentEditable = 'true';
+
 const userIcon = document.getElementById( 'user-icon' );
 const userMenu = document.getElementById( 'user-menu' );
+const fontBtn = document.getElementById( 'font-size-btn' );
+const fontPopup = document.getElementById( 'font-size-popup' );
+const fontSlider = document.getElementById( 'font-size-slider' );
+const fontValue = document.getElementById( 'font-size-value' );
+const editorEl = document.getElementById( 'editor' );
+const toast = document.getElementById( 'toast' );
+const darkBtn = document.getElementById( 'dark-btn' );
+const spreadBtn = document.getElementById( 'spread-btn' );
 
-const fontBtn = document.getElementById('font-size-btn');
-const fontPopup = document.getElementById('font-size-popup');
-const fontSlider = document.getElementById('font-size-slider');
-const fontValue = document.getElementById('font-size-value');
-const editorEl = document.getElementById('editor');
+editor.addEventListener( 'blur', () => {
+	setTimeout( () => {
+		editor.contentEditable = 'false';
+	}, 0 );
+} );
 
-// ポップアップ表示トグル
+
+// 3️⃣UI操作（フォント、ダークモードなど）
+userIcon.onclick = () => { userMenu.style.display = ( userMenu.style.display === 'block' ) ? 'none' : 'block'; }
+// Aa押した時の挙動
 fontBtn.onclick = e => {
-    e.stopPropagation();
-    fontPopup.style.display = (fontPopup.style.display === 'block') ? 'none' : 'block';
-		userMenu.style.display = 'none';
+	//ボタンを親要素に影響させない
+	e.stopPropagation();
+	// スライダーのやつ、fontPopup表示されていれば閉じる、閉じていれば表示する
+	fontPopup.style.display = ( fontPopup.style.display === 'block' ) ? 'none' : 'block';
+	// 押されたらユーザーメニューを非表示にする
+	userMenu.style.display = 'none';
 };
 
-// スライダーで文字サイズ変更
+// スライダーが確定されたら文字サイズ変更
 fontSlider.oninput = e => {
-    const size = fontSlider.value + 'px';
-		    // body全体に文字サイズを反映
-    document.body.style.fontSize = size;
-    editorEl.style.fontSize = size;
-		memoList.querySelectorAll('li').forEach(li => {
-        li.style.fontSize = size;              // 一覧も反映
-    });
-    fontValue.textContent = size;
-    localStorage.setItem('dreadnote-font-size', fontSlider.value);
+	const size = fontSlider.value + 'px';
+	// body全体、に文字サイズを反映
+	document.body.style.fontSize = size;
+	// editorElはHTMLのid editorのこと
+	editorEl.style.fontSize = size;
+	//一覧画面もサイズ反映
+	memoList.querySelectorAll( 'li' ).forEach( li => {
+		li.style.fontSize = size;
+	} );
+	//スライダーの横の文字も反映
+	fontValue.textContent = size;
+	//その端末にフォントサイズが残る
+	localStorage.setItem( 'dreadnote-font-size', fontSlider.value );
 };
 
-// 初期値を保存から反映
-const savedSize = localStorage.getItem('dreadnote-font-size');
-if (savedSize) {
-    editorEl.style.fontSize = savedSize + 'px';
-    fontSlider.value = savedSize;
-    fontValue.textContent = savedSize + 'px';
-		memoList.querySelectorAll('li').forEach(li => li.style.fontSize = savedSize + 'px');
+// 端末から反映
+const savedSize = localStorage.getItem( 'dreadnote-font-size' );
+//端末に初期値があればそれにする　ずれの原因これじゃね？まあいいや
+if ( savedSize ) {
+	editorEl.style.fontSize = savedSize + 'px';
+	fontSlider.value = savedSize;
+	fontValue.textContent = savedSize + 'px';
+	memoList.querySelectorAll( 'li' ).forEach( li => li.style.fontSize = savedSize + 'px' );
 }
 
-// ポップアップ外クリックで閉じる
-document.addEventListener('click', e => {
-    if (!fontPopup.contains(e.target) && e.target !== fontBtn) {
-        fontPopup.style.display = 'none';
-    }
-});
+// ポップアップ外クリックでスライダーとか閉じる
+document.addEventListener( 'click', e => {
+	if ( !fontPopup.contains( e.target ) && e.target !== fontBtn ) {
+		fontPopup.style.display = 'none';
+	}
+} );
 
-// Dark mode toggle
-const darkBtn = document.getElementById( 'dark-btn' );
 
+//ダークモードにするかどうかは端末に保存
 if ( darkBtn ) {
 	darkBtn.onclick = ( e ) => {
+		//ボタンを親要素に影響させない
 		e.stopPropagation();
 		document.body.classList.toggle( 'dark' );
 		localStorage.setItem(
@@ -81,9 +105,7 @@ if ( darkBtn ) {
 		);
 	};
 }
-// Spread mode toggle
-const spreadBtn = document.getElementById( 'spread-btn' );
-
+// Spread mode toggle（ダークと同様）
 if ( spreadBtn ) {
 	spreadBtn.onclick = ( e ) => {
 		e.stopPropagation();
@@ -95,37 +117,16 @@ if ( spreadBtn ) {
 	};
 }
 
-// 初期化（保存状態を反映）
+// 端末から保存状態を反映
 if ( localStorage.getItem( 'dreadnote-dark' ) === '1' ) {
 	document.body.classList.add( 'dark' );
 }
 if ( localStorage.getItem( 'dreadnote-spread' ) === '1' ) {
 	document.body.classList.add( 'spread' );
 }
-const toast = document.getElementById( 'toast' );
-const preview = document.getElementById( 'preview' );
-const previewContent = document.getElementById( 'preview-content' );
-const copyBtn = document.getElementById( 'copy-note' );
-const deleteBtn = document.getElementById( 'delete-note' );
-const closePreview = document.getElementById( 'close-preview' );
 
-let currentMemoId = null;
-let longPressTimer = null;
-// let memosCache=[];
 
-/* トースト表示 */
-function showToast( msg, d = 2000 ) { toast.textContent = msg; toast.classList.add( 'show' ); setTimeout( () => toast.classList.remove( 'show' ), d ); }
-function show( view ) { Object.values( views ).forEach( v => v.hidden = true ); views[view].hidden = false; }
-
-/* Auth */
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters( {
-	prompt: 'select_account'
-} )
-document.getElementById( 'google-login' ).onclick = async () => { try { await signInWithPopup( auth, provider ); } catch ( e ) { showToast( "Googleログイン失敗: " + e.message ); } };
-userIcon.onclick = () => { userMenu.style.display = ( userMenu.style.display === 'block' ) ? 'none' : 'block'; }
-
-document.getElementById( 'logout-btn' ).onclick = () => { userMenu.style.display = 'none'; metaCache = null;  signOut( auth ); location.hash = '#login'; }
+// 他の場所をクリックしたらメニューが閉じる
 document.addEventListener( 'click', e => {
 	if ( !userMenu.contains( e.target ) && e.target !== userIcon ) userMenu.style.display = 'none';
 	document.querySelectorAll( '.menu-popup' ).forEach( menu => {
@@ -134,7 +135,20 @@ document.addEventListener( 'click', e => {
 	} );
 } );
 
-/* Auth state */
+/* 4️⃣トースト表示（2.000秒間）の関数設定 */
+function showToast( msg, d = 2000 ) { toast.textContent = msg; toast.classList.add( 'show' ); setTimeout( () => toast.classList.remove( 'show' ), d ); }
+function show( view ) { Object.values( views ).forEach( v => v.hidden = true ); views[view].hidden = false; }
+
+/* 5️⃣6️⃣ 認証処理（Google ログイン / ログアウト） */
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters( {
+	prompt: 'select_account'
+} )
+
+document.getElementById( 'google-login' ).onclick = async () => { try { await signInWithPopup( auth, provider ); } catch ( e ) { showToast( "Googleログイン失敗: " + e.message ); } };
+
+document.getElementById( 'logout-btn' ).onclick = () => { userMenu.style.display = 'none'; metaCache = null; signOut( auth ); location.hash = '#login'; }
+
 onAuthStateChanged( auth, async user => {
 	// ★ ここで「画面を表示していい」と宣言
 	document.body.classList.remove( 'auth-loading' );
@@ -158,6 +172,7 @@ window.addEventListener( 'hashchange', () => {
 	navigate();
 } );
 
+//7️⃣ メモ関連の処理の関数（loadMeta, loadMemos, openEditor, saveMemo, updateMeta など）
 async function loadMetaOnce() {
 	if ( metaCache ) return metaCache;
 
@@ -219,6 +234,7 @@ async function loadMetaOnce() {
 
 	return metaCache;
 }
+
 async function loadMemos() {
 	await loadMetaOnce();
 	memoList.innerHTML = '';
@@ -250,9 +266,7 @@ async function loadMemos() {
 
 
 
-			/* =====================
-				 左側タイトル
-				 ===================== */
+			//左側タイトル
 
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
@@ -260,9 +274,7 @@ async function loadMemos() {
 			// titleSpan.style.fontSize = savedSize;
 			li.appendChild( titleSpan );
 
-			/* =====================
-				 右側（日付 + メニュー）
-				 ===================== */
+			// 右側（日付 + メニュー）
 			const rightDiv = document.createElement( 'div' );
 			rightDiv.className = 'memo-right';
 
@@ -314,13 +326,9 @@ async function loadMemos() {
 			};
 
 			rightDiv.append( dateSpan, menuBtn, menuPopup );
-			/* =====================
-	 aタグの中に右側も入れる
-	 ===================== */
+			//aタグの中に右側も入れる
 			li.appendChild( rightDiv );
-			/* =====================
-	 li に a を追加
-	 ===================== */
+			//li に a を追加
 			memoList.appendChild( li );
 		} );
 }
@@ -423,6 +431,8 @@ function loadTrash() {
 			trashList.appendChild( li );
 		} );
 }
+//currentMemoIdはトースト関係ないのでこっちにおく
+let currentMemoId = null;
 async function openEditor( id ) {
 	currentMemoId = id;
 
@@ -438,28 +448,28 @@ async function openEditor( id ) {
 }
 
 async function showEditor( data ) {
- // 既存タイトルを本文の1行目に追加
-const content = data.content || '';
+	// 既存タイトルを本文の1行目に追加
+	const content = data.content || '';
 
 
 
-// 改行を <div> に変換してセット
-    editor.innerHTML = content
-        .split('\n')
-        .map(line => line || '<div><br></div>')  // 空行も div に変換
-        .join('');
-				editor.style.fontSize = savedSize + 'px';
+	// 改行を <div> に変換してセット
+	editor.innerHTML = content
+		.split( '\n' )
+		.map( line => line || '<div><br></div>' )  // 空行も div に変換
+		.join( '' );
+	editor.style.fontSize = savedSize + 'px';
 
-    // カーソルを先頭に移動
-    const firstLine = editor.firstChild;
-    if (firstLine) {
-        const range = document.createRange();
-        const sel = window.getSelection();
-        range.selectNodeContents(firstLine);
-        range.collapse(true); // 先頭にセット
-        sel.removeAllRanges();
-        sel.addRange(range);
-    }
+	// カーソルを先頭に移動
+	const firstLine = editor.firstChild;
+	if ( firstLine ) {
+		const range = document.createRange();
+		const sel = window.getSelection();
+		range.selectNodeContents( firstLine );
+		range.collapse( true ); // 先頭にセット
+		sel.removeAllRanges();
+		sel.addRange( range );
+	}
 
 	// =================================
 	// 追加: editor 内の [Image] を Firestore から Base64 に置き換える
@@ -479,26 +489,24 @@ const content = data.content || '';
 	// =================================
 
 	show( 'editor' );
-	 // ===== ここで最初に文字がある行をタイトルにして保存 =====
-    if (currentMemoId) {
-        const lines = editor.innerText.split('\n');
-        let title = '';
-        for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed) {
-                title = trimmed;
-                break;
-            }
-        }
-        const meta = getMeta(currentMemoId);
-        if (meta && meta.title !== title) {
-            await updateMeta(currentMemoId, { title });
-        }
-    }
+	// ===== ここで最初に文字がある行をタイトルにして保存 =====
+	if ( currentMemoId ) {
+		const lines = editor.innerText.split( '\n' );
+		let title = '';
+		for ( const line of lines ) {
+			const trimmed = line.trim();
+			if ( trimmed ) {
+				title = trimmed;
+				break;
+			}
+		}
+		const meta = getMeta( currentMemoId );
+		if ( meta && meta.title !== title ) {
+			await updateMeta( currentMemoId, { title } );
+		}
+	}
 	window.scrollTo( 0, 0 );
 }
-
-
 
 let saveTimer = null;
 
@@ -507,101 +515,23 @@ function debounceSave() {
 	saveTimer = setTimeout( saveMemo, 500 );
 }
 
-// titleInput.addEventListener( 'input', debounceSave );
-editor.addEventListener( 'input', debounceSave );
-editor.addEventListener('input', () => {
-    if (!currentMemoId) return;
-
-    // 各行を取得
-    const lines = editor.innerText.split('\n');
-
-    // 最初に文字が含まれる行を探す
-    let title = '';
-    for (const line of lines) {
-        const trimmed = line.trim();
-        if (trimmed) { // 空行でなければタイトルに
-            title = trimmed;
-            break;
-        }
-    }
-
-    const meta = getMeta(currentMemoId);
-    if (meta && meta.title !== title) {
-        updateMeta(currentMemoId, { title });
-    }
-});
-
-// ===== Italic → h2 変換 =====
-editor.addEventListener('beforeinput', e => {
-  if (e.inputType === 'formatItalic') {
-    e.preventDefault();
-
-    // 選択範囲 or カーソル位置を h2 に
-    document.execCommand('formatBlock', false, 'h2');
-
-    // 念のため i / em が残ってたら剥がす
-    editor.querySelectorAll('i, em').forEach(el => {
-      el.replaceWith(...el.childNodes);
-    });
-
-    // 保存トリガー
-    editor.dispatchEvent(new Event('input', { bubbles: true }));
-  }
-});
-
-editor.addEventListener('keydown', e => {
-  const sel = document.getSelection();
-  if (!sel.rangeCount) return;
-
-  // カーソル直前のテキストを取得
-  const range = sel.getRangeAt(0);
-  const node = range.startContainer;
-  const offset = range.startOffset;
-
-  if (node.nodeType === 3) { // テキストノード
-    const text = node.textContent;
-    // ^_^ が直前にあるか？
-    if (text.slice(offset - 3, offset) === '^_^') {
-      e.preventDefault();
-
-      // ^_^ を削除
-      node.deleteData(offset - 3, 3);
-
-      // 選択範囲を h2 に
-      document.execCommand('formatBlock', false, 'h2');
-
-      // 念のため i/em を剥がす
-      editor.querySelectorAll('i, em').forEach(el => el.replaceWith(...el.childNodes));
-
-      // 保存トリガー
-      editor.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-  }
-});
-editor.addEventListener('keydown', e => {
-    // Windows: Ctrl+I / Mac: Cmd+I
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
-        e.preventDefault(); // ブラウザのデフォルト動作を止める
-        document.execCommand('italic'); // 選択中をイタリックに
-    }
-});
-
+//7️⃣-2 メモ関連の処理の関数（loadMeta, loadMemos, openEditor, saveMemo, updateMeta など）
 async function saveMemo() {
-    if (!currentMemoId) return;
+	if ( !currentMemoId ) return;
 
-    const lines = editor.innerText.split('\n');
-    const title = lines[0].trim();       // 1行目をタイトルに
-    const content = editor.innerHTML;    // 本文全体はHTMLで保存
+	const lines = editor.innerText.split( '\n' );
+	const title = lines[0].trim();       // 1行目をタイトルに
+	const content = editor.innerHTML;    // 本文全体はHTMLで保存
 
-    memoCache[currentMemoId] = { title, content, updated: Date.now() };
+	memoCache[currentMemoId] = { title, content, updated: Date.now() };
 
-    await setDoc(
-        doc(db, 'users', auth.currentUser.uid, 'memos', currentMemoId),
-        { content, updated: Date.now() },
-        { merge: true }
-    );
+	await setDoc(
+		doc( db, 'users', auth.currentUser.uid, 'memos', currentMemoId ),
+		{ content, updated: Date.now() },
+		{ merge: true }
+	);
 
-    await updateMeta(currentMemoId, { title, updated: Date.now() });
+	await updateMeta( currentMemoId, { title, updated: Date.now() } );
 }
 
 async function saveMeta() {
@@ -621,8 +551,103 @@ async function updateMeta( id, fields ) {
 	Object.assign( m, fields );
 	await saveMeta();
 }
-// updateMeta(currentMemoId, title);
 
+//8️⃣ エディターイベント（入力、貼り付け、キーボード操作）
+//タイトル取得
+editor.addEventListener( 'input', debounceSave );
+editor.addEventListener( 'input', () => {
+	if ( !currentMemoId ) return;
+
+	// 各行を取得
+	const lines = editor.innerText.split( '\n' );
+
+	// 最初に文字が含まれる行を探す
+	let title = '';
+	for ( const line of lines ) {
+		const trimmed = line.trim();
+		if ( trimmed ) { // 空行でなければタイトルに
+			title = trimmed;
+			break;
+		}
+	}
+
+	const meta = getMeta( currentMemoId );
+	if ( meta && meta.title !== title ) {
+		updateMeta( currentMemoId, { title } );
+	}
+} );
+
+// ===== Italic → h2 変換 =====
+editor.addEventListener( 'beforeinput', e => {
+	if ( e.inputType === 'formatItalic' ) {
+		e.preventDefault();
+
+		// 選択範囲 or カーソル位置を h2 に
+		document.execCommand( 'formatBlock', false, 'h2' );
+
+		// 念のため i / em が残ってたら剥がす
+		editor.querySelectorAll( 'i, em' ).forEach( el => {
+			el.replaceWith( ...el.childNodes );
+		} );
+
+		// 保存トリガー
+		editor.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+	}
+} );
+
+editor.addEventListener( 'beforeinput', e => {
+	if ( e.inputType === 'formatUnderline' ) {
+		e.preventDefault(); // デフォルトの下線を止める
+
+		// 選択範囲に <s> を適用
+		document.execCommand( 'strikeThrough' );
+
+		// 念のため i / em / u が残ってたら剥がす
+		editor.querySelectorAll( 'i, em, u' ).forEach( el => {
+			el.replaceWith( ...el.childNodes );
+		} );
+
+		// 保存トリガー
+		editor.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+	}
+} );
+
+editor.addEventListener( 'keydown', e => {
+	const sel = document.getSelection();
+	if ( !sel.rangeCount ) return;
+
+	// カーソル直前のテキストを取得
+	const range = sel.getRangeAt( 0 );
+	const node = range.startContainer;
+	const offset = range.startOffset;
+
+	if ( node.nodeType === 3 ) { // テキストノード
+		const text = node.textContent;
+		// ^_^ が直前にあるか？
+		if ( text.slice( offset - 3, offset ) === '^_^' ) {
+			e.preventDefault();
+
+			// ^_^ を削除
+			node.deleteData( offset - 3, 3 );
+
+			// 選択範囲を h2 に
+			document.execCommand( 'formatBlock', false, 'h2' );
+
+			// 念のため i/em を剥がす
+			editor.querySelectorAll( 'i, em' ).forEach( el => el.replaceWith( ...el.childNodes ) );
+
+			// 保存トリガー
+			editor.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+		}
+	}
+} );
+editor.addEventListener( 'keydown', e => {
+	// Windows: Ctrl+I / Mac: Cmd+I
+	if ( ( e.ctrlKey || e.metaKey ) && e.key.toLowerCase() === 'i' ) {
+		e.preventDefault(); // ブラウザのデフォルト動作を止める
+		document.execCommand( 'italic' ); // 選択中をイタリックに
+	}
+} );
 
 /* Paste処理（画像・埋め込み・テキスト対応 完全版） */
 editor.addEventListener( 'paste', async e => {
@@ -683,7 +708,7 @@ editor.addEventListener( 'paste', async e => {
 			e.preventDefault();
 			const file = item.getAsFile();
 			const originalSizeBytes = file.size;  // これが貼り付け時点の容量
-const originalSizeMB = (originalSizeBytes / (1024*1024)).toFixed(2);
+			const originalSizeMB = ( originalSizeBytes / ( 1024 * 1024 ) ).toFixed( 2 );
 			const img = new Image();
 			const blobUrl = URL.createObjectURL( file );
 			img.src = blobUrl;
@@ -730,22 +755,22 @@ const originalSizeMB = (originalSizeBytes / (1024*1024)).toFixed(2);
 				const pad = n => n.toString().padStart( 2, '0' );
 				const filename = `pasted_${now.getFullYear()}-${pad( now.getMonth() + 1 )}-${pad( now.getDate() )}_${pad( now.getHours() )}-${pad( now.getMinutes() )}-${pad( now.getSeconds() )}`;
 				await setDoc( doc( db, "images", filename ), { data: base64 } );
-// サイズ表示用関数
-function formatSize(bytes) {
-    if (bytes >= 1024 * 1024) {
-        return (bytes / (1024 * 1024)).toFixed(1) + ' MB'; // 1MB以上 → MB、小数1桁
-    } else {
-        return Math.round(bytes / 1024) + ' KB';           // 1MB未満 → KB、整数
-    }
-}
+				// サイズ表示用関数
+				function formatSize( bytes ) {
+					if ( bytes >= 1024 * 1024 ) {
+						return ( bytes / ( 1024 * 1024 ) ).toFixed( 1 ) + ' MB'; // 1MB以上 → MB、小数1桁
+					} else {
+						return Math.round( bytes / 1024 ) + ' KB';           // 1MB未満 → KB、整数
+					}
+				}
 				const sizeBytes = base64.length;
 				// サイズを文字列に変換
-const savedSizeStr = formatSize(sizeBytes);
-const originalSizeStr = formatSize(originalSizeBytes);
+				const savedSizeStr = formatSize( sizeBytes );
+				const originalSizeStr = formatSize( originalSizeBytes );
 
-// alert 表示
-alert(`${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG loops: ${loopCount}`);
-showToast(`${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG loops: ${loopCount}`);
+				// alert 表示
+				alert( `${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG loops: ${loopCount}` );
+				showToast( `${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG loops: ${loopCount}` );
 
 
 				insertImageFromBase64( base64, filename, true );
@@ -829,18 +854,125 @@ showToast(`${now}: Saved: ${savedSizeStr} (Original: ${originalSizeStr}) | JPEG 
 		return;
 	}
 
-	// URL付き画像
+	// URL付き画像も含むリンク
 	const imgRegex = /https?:\/\/\S+\.(?:png|jpg|jpeg|gif)/i;
 	if ( imgRegex.test( text ) ) {
+		const aEl = document.createElement( 'a' );
+		aEl.href = text;
+		aEl.dataset.url = text;
+		aEl.target = '_blank';
 		const imgEl = document.createElement( 'img' );
 		imgEl.src = text;
-		imgEl.dataset.url = text;
-		insertNodeWithCursor( imgEl, text, true );
+		aEl.appendChild( imgEl );
+		insertNodeWithCursor( aEl, text, true );
+		return;
+	}
+
+	// 通常リンク
+	const urlRegex = /(https?:\/\/[^\s]+)/i;
+	const urlMatch = text.match( urlRegex );
+	if ( urlMatch ) {
+		const aEl = document.createElement( 'a' );
+		aEl.href = urlMatch[0];        // マッチしたURLをhrefに
+		aEl.textContent = urlMatch[0]; // そのままテキストとして表示
+		aEl.target = '_blank';
+		aEl.dataset.url = urlMatch[0]; // Deleteで戻す用
+		insertNodeWithCursor( aEl, urlMatch[0], false );
 		return;
 	}
 
 	// 通常テキスト
 	insertNodeWithCursor( document.createTextNode( text ), null, false );
+} );
+editor.addEventListener( 'click', e => {
+	const a = e.target.closest( 'a' );
+	if ( !a ) return;
+
+	// 編集中だけJS制御
+	if ( editor.contentEditable === 'true' ) {
+		e.preventDefault();
+		return;
+	}
+
+	// 閲覧中は何もしない（Safariに任せる）
+} );
+
+
+let touchStartTime = 0;
+let touchMoved = false;
+let longPress = false;
+let lastTouch = null;
+
+
+editor.addEventListener( 'touchstart', e => {
+	lastTouch = e.touches[0];   // ← ★この1行を追加
+	touchStartTime = Date.now();
+	touchMoved = false;
+	longPress = false;
+
+	// リンク・画像・埋め込み上は長押し候補
+	if (
+		e.target.closest( 'a' ) ||
+		e.target.closest( 'img' ) ||
+		e.target.closest( 'iframe' ) ||
+		e.target.closest( '.video' ) ||
+		e.target.closest( '.twitter' ) ||
+		e.target.closest( '.instagram' )
+	) {
+		longPress = true;
+	}
+} );
+
+editor.addEventListener( 'touchmove', () => {
+	touchMoved = true;
+} );
+
+editor.addEventListener( 'touchend', () => {
+	// 🔒 リンクプレビュー後は何もしない
+	if ( longPress ) return;
+
+	const dt = Date.now() - touchStartTime;
+
+	// 短タップだけ編集開始
+	if (
+		dt < 300 &&
+		!touchMoved &&
+		editor.contentEditable === 'false'
+	) {
+		editor.contentEditable = 'true';
+		// editor.focus();
+		const x = lastTouch.clientX;
+		const y = lastTouch.clientY;
+
+		const range = document.caretRangeFromPoint( x, y );
+		if ( range ) {
+			const sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange( range );
+		}
+
+		editor.focus( { preventScroll: true } );
+	}
+} );
+
+
+
+editor.addEventListener( 'keydown', ( e ) => {
+	// Undo (Cmd/Ctrl + Z)
+	if ( ( e.metaKey || e.ctrlKey ) && !e.shiftKey && e.key.toLowerCase() === 'z' ) {
+		e.preventDefault();
+		// @ts-ignore
+		document.execCommand( 'undo' );
+		return;
+	}
+
+	// Redo (Cmd/Ctrl + Shift + Z)
+	if ( ( e.metaKey || e.ctrlKey ) && e.shiftKey && e.key.toLowerCase() === 'z' ) {
+		e.preventDefault();
+		// @ts-ignore
+		document.execCommand( 'redo' );
+		return;
+	}
 } );
 
 // Delete/Backspaceで元URLに戻す
@@ -850,6 +982,8 @@ editor.addEventListener( 'keydown', e => {
 	const sel = document.getSelection();
 	if ( !sel.rangeCount ) return;
 	const range = sel.getRangeAt( 0 );
+	// 範囲選択なら完全にデフォルトに任せる
+	if ( !range.collapsed ) return;
 
 	// テキストノードなら親をチェック
 	let node = range.startContainer;
@@ -863,31 +997,23 @@ editor.addEventListener( 'keydown', e => {
 	// 元URLに置き換え
 	const urlText = document.createTextNode( node.dataset.url );
 	node.replaceWith( urlText );
-	// 改行追加（必要なら）
-	const br = document.createElement( 'br' );
-	urlText.after( br );
-	// カーソル位置をセット
-	range.setStartAfter( urlText );
-	range.collapse( true );
+	const newRange = document.createRange();
+	newRange.selectNodeContents( urlText );
+
 	sel.removeAllRanges();
-	sel.addRange( range );
+	sel.addRange( newRange );
+
+	// focus を明示的にセット（iOS 対応）
+	editor.focus();
+
+	// 改行追加（range 選択後に置く）
+	// const br = document.createElement( 'br' );
+	// urlText.after( br );
+
 	editor.dispatchEvent( new Event( 'input', { bubbles: true } ) );
 } );
 
-/* Preview */
-function showPreview( id, title, content ) {
-	previewContent.innerHTML = `<strong>${title}</strong><br>${content}`;
-	preview.style.display = 'block';
-	copyBtn.onclick = () => { navigator.clipboard.writeText( content || '' ); showToast( 'Copied' ); }
-	deleteBtn.onclick = async () => {
-		await updateMeta( id, { deleted: true, updated: Date.now() } );
-		preview.style.display = 'none';
-		showToast( 'Moved to Trash' );
-		loadMemos(); // ← これ
-	}
-	closePreview.onclick = () => preview.style.display = 'none';
-}
-
+/* 9️⃣ ナビゲーション・新規作成ボタン*/
 document.getElementById( 'go-trash' ).onclick = () => { location.hash = '#/trash'; }
 document.getElementById( 'back-list' ).onclick = () => { location.hash = '#/list'; }
 document.getElementById( 'back' ).onclick = () => { if ( history.length > 1 ) history.back(); else location.hash = '#/list'; }

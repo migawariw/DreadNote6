@@ -169,14 +169,25 @@ li .memo-title {
 }
 
 #editor a {
-	color: #1c1c1e;
-	text-decoration: none;
-}
+    cursor: pointer;
+    text-decoration: underline !important; /* 下線を強制 */
+	/* 👇 iOS長押し必須 */
+	-webkit-touch-callout: default;
+	-webkit-user-select: text;
+	user-select: text;
+	pointer-events: auto;
 
-#editor a:hover,
-#editor a:focus,
-#editor a:active {
-	text-decoration: none;
+	/* 👇 Safariが「普通のリンク」と認識する条件 */
+	display: inline;
+	position: static;
+	color: #0071e3;
+
+}
+#editor a:visited {
+	color: #754cafb7;
+}
+body.dark #editor a:visited {
+	color: #c7a3f9b7;
 }
 
 
@@ -533,9 +544,9 @@ body.dark #user-menu button {
 body.dark #user-menu button:hover {
 	background: #24242e;
 }
-body.dark #editor a {
+/* body.dark #editor a {
 	color: #f2f2f7;
-}
+} */
 
 
 /* ボタンの基本サイズ */
