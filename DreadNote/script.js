@@ -289,7 +289,7 @@ async function loadMemos() {
 
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
-			titleSpan.textContent = m.title || 'Logged at';
+			titleSpan.textContent = m.title || 'New Note';
 			// titleSpan.style.fontSize = savedSize;
 			li.appendChild( titleSpan );
 
@@ -385,7 +385,7 @@ function loadTrash() {
 
 			const titleSpan = document.createElement( 'span' );
 			titleSpan.className = 'memo-title';
-			titleSpan.textContent = m.title || 'Logged at';
+			titleSpan.textContent = m.title || 'New Note';
 			li.appendChild( titleSpan );
 
 			// 右側の操作領域
