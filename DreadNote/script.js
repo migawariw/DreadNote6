@@ -44,7 +44,26 @@ editor.addEventListener( 'blur', () => {
 		editor.contentEditable = 'false';
 	}, 0 );
 } );
+// PC: クリックで編集開始
+editor.addEventListener('mousedown', e => {
+	// 長押しやリンククリックは除外
+	if (e.target.closest('a') || e.target.closest('img') || e.target.closest('iframe')) return;
 
+	if (editor.contentEditable === 'false') {
+		editor.contentEditable = 'true';
+
+		const x = e.clientX;
+		const y = e.clientY;
+		const range = document.caretRangeFromPoint(x, y);
+		if (range) {
+			const sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		}
+
+		editor.focus({ preventScroll: true });
+	}
+});
 
 // 3️⃣UI操作（フォント、ダークモードなど）
 userIcon.onclick = () => { userMenu.style.display = ( userMenu.style.display === 'block' ) ? 'none' : 'block'; }
